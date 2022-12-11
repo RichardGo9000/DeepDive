@@ -18,28 +18,29 @@ export default class MainMenu extends Phaser.Scene {
     const { width, height } = this.scale;
     // Draw the logo at the top of the screen
     this.add.image(window.innerWidth / 2, 70, 'logo').setScale(0.75);
-    // Play Main Button
-    const playMainButton = this.add.image(width * 0.5, height * 0.6, 'glass-UI', 'glassPanel.png')
+    // Play Continue Game Button
+    const playContineGameButton = this.add.image(width * 0.5, height * 0.6, 'glass-UI', 'glassPanel.png')
       .setDisplaySize(250, 50)
       .setInteractive()
       .on('selected', () => { this.scene.start('GameScene'); })
       .on('pointerover', () => { this.selectButton(0); })
       .on('pointerdown', () => { this.scene.start('GameScene'); })
 
-    this.add.text(playMainButton.x, playMainButton.y, 'Play (Main Game)').setOrigin(0.5);
+    this.add.text(playContineGameButton.x, playContineGameButton.y, 'Continue Game').setOrigin(0.5);
 
-    // Play Button
-    const playMatterButton = this.add.image(playMainButton.x, playMainButton.y + playMainButton.displayHeight + 10, 'glass-UI', 'glassPanel.png')
+
+    // Play New Game Button
+    const playNewGameButton = this.add.image(playContineGameButton.x, playContineGameButton.y + playContineGameButton.displayHeight + 10, 'glass-UI', 'glassPanel.png')
       .setDisplaySize(250, 50)
       .setInteractive()
       .on('selected', () => { this.scene.start('MatterScene'); })
       .on('pointerover', () => { this.selectButton(1); })
       .on('pointerdown', () => { this.scene.start('MatterScene'); })
 
-    this.add.text(playMatterButton.x, playMatterButton.y, 'Play (Matter Demo)').setOrigin(0.5);
+    this.add.text(playNewGameButton.x, playNewGameButton.y, 'Start New Game').setOrigin(0.5);
 
     // Options Button
-    const optionsButton = this.add.image(playMatterButton.x, playMatterButton.y + playMatterButton.displayHeight + 10, 'glass-UI', 'glassPanel.png')
+    const optionsButton = this.add.image(playNewGameButton.x, playNewGameButton.y + playNewGameButton.displayHeight + 10, 'glass-UI', 'glassPanel.png')
       .setDisplaySize(250, 50)
       .setInteractive()
       .on('selected', () => { console.log('Options'); })
@@ -49,7 +50,7 @@ export default class MainMenu extends Phaser.Scene {
     this.add.text(optionsButton.x, optionsButton.y, 'Options').setOrigin(0.5);
 
     // Add Buttons
-    this.buttons.push(playMainButton, playMatterButton, optionsButton);
+    this.buttons.push(playContineGameButton, playNewGameButton, optionsButton, playNewGameButton);
 
     // Add Cursor
     this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_hand.png')
@@ -59,12 +60,12 @@ export default class MainMenu extends Phaser.Scene {
 
     // Clear events on SHUTDOWN
     this.events.once(Phaser.Scenes.Events.SHUTDOWN as string, () => {
-      playMainButton.off('selected');
+      playContineGameButton.off('selected');
       optionsButton.off('selected');
     });
   }
 
-  selectButton(index: number){
+  selectButton(index: number) {
     const currentButton = this.buttons[this.selectedButtonIndex];
 
     // set the current select button to a white tint
@@ -92,21 +93,21 @@ export default class MainMenu extends Phaser.Scene {
     this.selectButton(nextIndex);
   }
 
-  confirmSelection(){
+  confirmSelection() {
     this.buttons[this.selectedButtonIndex].emit('selected');
   }
 
-  update(){
+  update() {
     const { up, down, space } = this.cursors;
     const upJustPressed = Phaser.Input.Keyboard.JustDown(up);
     const downJustPressed = Phaser.Input.Keyboard.JustDown(down);
     const spaceJustPressed = Phaser.Input.Keyboard.JustDown(space);
 
-    if (upJustPressed){
+    if (upJustPressed) {
       this.selectNextButton(-1);
-    } else if (downJustPressed){
+    } else if (downJustPressed) {
       this.selectNextButton(1);
-    } else if (spaceJustPressed){
+    } else if (spaceJustPressed) {
       this.confirmSelection();
     }
   }
