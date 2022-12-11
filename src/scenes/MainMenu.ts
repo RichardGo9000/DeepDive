@@ -53,7 +53,8 @@ export default class MainMenu extends Phaser.Scene {
     this.buttons.push(playContineGameButton, playNewGameButton, optionsButton, playNewGameButton);
 
     // Add Cursor
-    this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_hand.png')
+    // this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_hand.png')
+    this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_pointer3D.png')
 
     // Select the first button
     this.selectButton(0);
