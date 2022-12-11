@@ -56,7 +56,7 @@ export default class MainMenu extends Phaser.Scene {
     // this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_hand.png')
     this.buttonSelector = this.add.image(0, 0, 'glass-UI', 'cursor_pointer3D.png')
 
-    // Select the first button
+    // Select default button to highlight
     this.selectButton(0);
 
     // Clear events on SHUTDOWN
