@@ -58,7 +58,7 @@ export default class UI extends Phaser.Scene {
     const width = 200
     const percent = Phaser.Math.Clamp(value, 0, 100) / 100
 
-    this.graphics.clear()
+    // this.graphics.clear()
     this.graphics.fillStyle(0xffffff)
     this.graphics.fillRoundedRect(10, 40, width, 20, 5)
     if (percent > 0) {
@@ -71,7 +71,7 @@ export default class UI extends Phaser.Scene {
     const width = 200
     const percent = Phaser.Math.Clamp(value, 0, 100) / 100
 
-    this.graphics.clear()
+    // this.graphics.clear()
     this.graphics.fillStyle(0xffff00)
     this.graphics.fillRoundedRect(10, 70, width, 20, 5)
     if (percent > 0) {

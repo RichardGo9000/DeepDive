@@ -6,6 +6,7 @@ import makeArrayOf from '../modules/makeArrayOf.js';
 import range from '../modules/range.js';
 
 export default class Game extends Phaser.Scene {
+  graphics: Phaser.GameObjects.Graphics | undefined = undefined;
   cursorKeys!: Phaser.Types.Input.Keyboard.CursorKeys;
 
   player?: PlayerController;
@@ -26,7 +27,7 @@ export default class Game extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('cityTiles', 'assets/tilemaps/tilemap.png');
+    // this.load.image('cityTiles', 'assets/tilemaps/tilemap.png');
     this.load.tilemapTiledJSON('levelOne', 'assets/tilemaps/CItyOne.json');
 
     // this.matter.world.disableGravity();
@@ -43,7 +44,8 @@ export default class Game extends Phaser.Scene {
 
     const spriteChoice = ['player', 'noid', 'dogBoy', 'goop', 'cleetus', 'wheelie', 'rocko', 'leo', 'pascal'][Phaser.Math.Between(0, 8)];
     // Load the player sprite
-    this.load.spritesheet('mallory', `assets/players/${spriteChoice}-sheet.png`, { frameWidth: 24, frameHeight: 24 });
+    // this.load.spritesheet('mallory', `assets/players/${spriteChoice}-sheet.png`, { frameWidth: 24, frameHeight: 24 });
+    this.load.spritesheet('minisub', `assets/vehicles/DSVSpriteSheet.png`, { frameWidth: 1024, frameHeight: 1024 });
   }
 
   create() {
@@ -54,15 +56,20 @@ export default class Game extends Phaser.Scene {
     const tileset = map.addTilesetImage('tilemap', 'cityTiles');
     const layer = map.createLayer(0, tileset, window.innerWidth / 3.33, window.innerHeight / 3.33);
 
+    //Set Background
+    this.graphics = this.add.graphics();
+    this.graphics.fillStyle(0x0000ff, 0.5);
+    this.graphics.fillRect(0, 0, window.outerWidth, 100000000);
+
     layer.setCollisionByProperty({ collides: true });
 
-    // Draw the logo above the background
-    const logo = this.add.image(window.innerWidth / 2, 70, 'logo');
+    // // Draw the logo above the background
+    // const logo = this.add.image(window.innerWidth / 2, 70, 'logo');
 
-    // Move the logo back and forth
-    this.tweens.add({
-      targets: logo, y: 90, duration: 900, ease: 'Sine.inOut', yoyo: true, repeat: -1
-    });
+    // // Move the logo back and forth
+    // this.tweens.add({
+    //   targets: logo, y: 90, duration: 900, ease: 'Sine.inOut', yoyo: true, repeat: -1
+    // });
 
     // Create staticGroup to house the platforms
     // this.platforms = this.physics.add.staticGroup();
@@ -97,14 +104,15 @@ export default class Game extends Phaser.Scene {
     // });
 
     // Draw the player sprite
-    this.playerSprite = this.add.sprite(940, 320, 'mallory', 0);
+    this.playerSprite = this.add.sprite(940, 320, 'minisub', 0).setScale(0.35);
     // Assign the player instance
     this.player = new PlayerController({
       scene: this,
       sprite: this.playerSprite,
       cursorKeys: this.cursorKeys,
       obstacles: this.obstacles,
-      options: { label: 'Mallory' }
+      // options: { label: 'Mallory' }
+      options: { label: 'minisub' }
     });
 
     // Follow the player

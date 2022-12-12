@@ -41,6 +41,8 @@ export default class PlayerController {
   private body: MatterJS.BodyType;
   private stateMachine: StateMachine<'idle'|'walking'|'jumping'>;
   private health = 100
+  private oxygen = 100
+  private battery = 100
   private speed = { x: 3, y: 2};
 
   constructor({ scene, sprite, cursorKeys, obstacles, options }: PlayerConstructor) {
@@ -78,7 +80,7 @@ export default class PlayerController {
     this.sprite.anims.create({
       key: 'move',
       frameRate: 15,
-      frames: this.sprite.anims.generateFrameNumbers('mallory', {start: 0, end: 4}),
+      frames: this.sprite.anims.generateFrameNumbers('minisub', {start: 0, end: 0}),
       repeat: -1
     });
   }
@@ -106,10 +108,10 @@ export default class PlayerController {
 
     if (left.isDown) {
       matter.body.setVelocity(this.body, { x: -xSpeed, y: this.body.velocity.y })
-      this.sprite.setFlipX(true);
+      this.sprite.setFlipX(false);
     } else if (right.isDown) {
       matter.body.setVelocity(this.body, { x: xSpeed, y: this.body.velocity.y })
-      this.sprite.setFlipX(false);
+      this.sprite.setFlipX(true);
     } else {
       matter.body.setVelocity(this.body, { x: 0, y: this.body.velocity.y })
       this.stateMachine.setState('idle');
