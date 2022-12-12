@@ -9,7 +9,7 @@ export default class UI extends Phaser.Scene {
   private healthText!: Phaser.GameObjects.Text;
   private lastHealth = 100;
   private lastOxygen = 100;
-  // private lastBattery = 100;
+  private lastBattery = 100;
 
   constructor() { super({ key: 'ui' }); }
 
