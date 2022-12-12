@@ -9,6 +9,7 @@ export default class UI extends Phaser.Scene {
   private healthText!: Phaser.GameObjects.Text;
   private lastHealth = 100;
   private lastOxygen = 100;
+  private lastBattery = 100;
 
   constructor() { super({ key: 'ui' }); }
 
@@ -18,16 +19,18 @@ export default class UI extends Phaser.Scene {
     this.graphics = this.add.graphics();
     this.setHealthBar(100);
     this.setOxygenBar(100 );
+    this.setBatteryBar(100 );
     this.backText = this.add.text(10, window.innerWidth / 6, 'Back to Main Menu', { fontSize: '16px' })
       .setInteractive()
       .on('pointerdown', () => { this.scene.start('main-menu'); })
       .on('pointerover', () => { this.backText.setColor('#ff0'); })
       .on('pointerout', () => { this.backText.setColor('#fff'); });
 
-    this.techText = this.add.text(10, 70, 'Tech: 0', { fontSize: '16px' });
+    this.techText = this.add.text(10, 100, 'Tech: 0', { fontSize: '16px' });
 
     events.on('health-changed', this.handleHealthChanged, this);
     events.on('oxygen-changed', this.handleOxygenChanged, this);
+    events.on('battery-changed', this.handleBatteryChanged, this);
     events.on('tech-collected', this.handleTechCollected, this);
 
 
@@ -64,6 +67,20 @@ export default class UI extends Phaser.Scene {
     }
   }
 
+  private setBatteryBar(value: number) {
+    const width = 200
+    const percent = Phaser.Math.Clamp(value, 0, 100) / 100
+
+    this.graphics.clear()
+    this.graphics.fillStyle(0xffff00)
+    this.graphics.fillRoundedRect(10, 70, width, 20, 5)
+    if (percent > 0) {
+      this.graphics.fillStyle(0x00ff00)
+      this.graphics.fillRoundedRect(10, 10, width * percent, 20, 5)
+    }
+  }
+
+
   private handleHealthChanged(value: number) {
     this.tweens.addCounter({
       from: this.lastHealth,
@@ -92,6 +109,21 @@ export default class UI extends Phaser.Scene {
     })
 
     this.lastOxygen = value
+  }
+
+  private handleBatteryChanged(value: number) {
+    this.tweens.addCounter({
+      from: this.lastHealth,
+      to: value,
+      duration: 200,
+      ease: Phaser.Math.Easing.Sine.InOut,
+      onUpdate: tween => {
+        const value = tween.getValue()
+        this.setBatteryBar(value)
+      }
+    })
+
+    this.lastBattery = value
   }
 
   private handleTechCollected() {
