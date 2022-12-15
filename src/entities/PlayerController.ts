@@ -21,6 +21,7 @@ interface PlayerSceneOptions {
   origin?: { x: number, y: number };
 }
 
+//frictionAir will need to be changed for water, but there may be another location that is better suited to this change
 const defaults = {
   label: 'Player',
   speed: { x: 3, y: 2 },
@@ -39,7 +40,7 @@ export default class PlayerController {
   private obstacles: ObstaclesController;
   private options: Required<PlayerSceneOptions>;
   private body: MatterJS.BodyType;
-  private stateMachine: StateMachine<'idle'|'walking'|'jumping'>;
+  private stateMachine: StateMachine<'idle'|'walking'|'jumping'|'movingForward'>;
   private health = 100
   private oxygen = 100
   private battery = 100
@@ -69,16 +70,38 @@ export default class PlayerController {
 
     this.stateMachine = new StateMachine(this, this.options.label);
 
+    //need to change states to be applicable to a submarine
+    // idle
+    // movingForward
+    // open top door
+    // close top door
+    // open bottom door
+    // close top door
     this.stateMachine
     .addState('idle', { onEnter: this.idleOnEnter, onUpdate: this.idleOnUpdate })
+    .addState('movingForward', { onEnter: this.movingForwardOnEnter, onUpdate: this.movingForwardOnUpdate })
     .addState('walking', { onEnter: this.walkingOnEnter, onUpdate: this.walkingOnUpdate })
     .addState('jumping', { onEnter: this.jumpingOnEnter, onUpdate: this.jumpingOnUpdate })
     .setState('walking');
   }
 
   private createAnimations(){
+    // open top
+    // close top
+    // open bottom
+    // close bottom
+
+    // move forward
     this.sprite.anims.create({
       key: 'move',
+      frameRate: 15,
+      frames: this.sprite.anims.generateFrameNumbers('minisub', {start: 9, end: 11}),
+      repeat: -1
+    });
+
+    // idle
+    this.sprite.anims.create({
+      key: 'idle',
       frameRate: 15,
       frames: this.sprite.anims.generateFrameNumbers('minisub', {start: 0, end: 0}),
       repeat: -1
@@ -89,7 +112,11 @@ export default class PlayerController {
     this.stateMachine.update(delta);
   }
 
-  private idleOnEnter() { this.sprite.anims.stop(); }
+  private idleOnEnter() { 
+    //display idle animation here        <--
+this.sprite.anims.play('idle', true);
+    this.sprite.anims.stop(); 
+  }
 
   private idleOnUpdate(){
     const { left, right, up } = this.cursors;
@@ -99,8 +126,13 @@ export default class PlayerController {
     if (spaceJustPressed || up.isDown) this.stateMachine.setState('jumping');
   }
 
+  private movingForwardOnEnter() {
+    //this.sprite.anims.play('move', true);
+  }
+
   private walkingOnEnter() { this.sprite.anims.play('move', true); }
 
+  //change to movingOnUpdate()
   private walkingOnUpdate() {
     const { left, right, up, space } = this.cursors;
     const xSpeed = this.speed.x;
@@ -121,12 +153,14 @@ export default class PlayerController {
     if (spaceJustPressed || up.isDown) this.stateMachine.setState('jumping');
   }
 
+  //need to delete
   private jumpingOnEnter() {
     const { matter } = this.scene;
     const ySpeed = this.speed.y;
     matter.body.setVelocity(this.body, { x: this.body.velocity.x, y: -ySpeed });
    }
 
+  //need to delete
   private jumpingOnUpdate() {
     const { left, right } = this.cursors;
     const xSpeed = this.speed.x;
@@ -145,6 +179,7 @@ export default class PlayerController {
     // if (this.sprite.body.touching.down) this.stateMachine.setState('walking');
   }
 
+  // probably need to add some delete commands here or update when this is called
   destroy() {
     this.sprite.destroy();
     this.stateMachine.destroy();
