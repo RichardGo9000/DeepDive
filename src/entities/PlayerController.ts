@@ -73,10 +73,6 @@ export default class PlayerController {
     //need to change states to be applicable to a submarine
     // idle
     // movingForward
-    // open top door
-    // close top door
-    // open bottom door
-    // close top door
     this.stateMachine
       .addState('idle', { onEnter: this.idleOnEnter, onUpdate: this.idleOnUpdate })
       .addState('movingForward', { onEnter: this.movingForwardOnEnter, onUpdate: this.movingForwardOnUpdate })
@@ -130,7 +126,6 @@ export default class PlayerController {
     const { left, right, up } = this.cursors;
     if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
     if (up.isDown) this.stateMachine.setState('openTopHatch');
-    
   }
 
   private movingForwardOnEnter() {
@@ -163,10 +158,7 @@ export default class PlayerController {
   }
 
   private openTopHatchOnUpdate() {
-    const { left, right, up, down } = this.cursors;
-    // console.log('');
-    // if (left.isDown || right.isDown) this.stateMachine.setState('closeTopHatch');
-    // if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
+    const { down } = this.cursors;
     if (down.isDown) this.stateMachine.setState('closeTopHatch');
   }
 
