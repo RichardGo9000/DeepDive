@@ -35,16 +35,16 @@ const defaults = {
 
 export default class PlayerController {
   private scene: Phaser.Scene;
-  private sprite: Phaser.GameObjects.Sprite|Phaser.Physics.Matter.Sprite;
+  private sprite: Phaser.GameObjects.Sprite | Phaser.Physics.Matter.Sprite;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
   private obstacles: ObstaclesController;
   private options: Required<PlayerSceneOptions>;
   private body: MatterJS.BodyType;
-  private stateMachine: StateMachine<'idle'|'walking'|'jumping'|'movingForward'>;
+  private stateMachine: StateMachine<'idle' | 'movingForward' | 'openTopHatch' | 'closeTopHatch' | 'openBottomHatch' | 'closeBottomHatch'>;
   private health = 100
   private oxygen = 100
   private battery = 100
-  private speed = { x: 3, y: 2};
+  private speed = { x: 3, y: 2 };
 
   constructor({ scene, sprite, cursorKeys, obstacles, options }: PlayerConstructor) {
     this.options = { ...defaults, ...options };
@@ -54,7 +54,7 @@ export default class PlayerController {
     this.sprite = sprite;
     this.cursors = cursorKeys;
     this.obstacles = obstacles;
-    
+
     this.createAnimations();
 
     this.body = this.scene.matter.bodies.circle(this.sprite.x, this.sprite.y, this.options.radius, {
@@ -78,14 +78,14 @@ export default class PlayerController {
     // open bottom door
     // close top door
     this.stateMachine
-    .addState('idle', { onEnter: this.idleOnEnter, onUpdate: this.idleOnUpdate })
-    .addState('movingForward', { onEnter: this.movingForwardOnEnter, onUpdate: this.movingForwardOnUpdate })
-    .addState('walking', { onEnter: this.walkingOnEnter, onUpdate: this.walkingOnUpdate })
-    .addState('jumping', { onEnter: this.jumpingOnEnter, onUpdate: this.jumpingOnUpdate })
-    .setState('walking');
+      .addState('idle', { onEnter: this.idleOnEnter, onUpdate: this.idleOnUpdate })
+      .addState('movingForward', { onEnter: this.movingForwardOnEnter, onUpdate: this.movingForwardOnUpdate })
+      .addState('openTopHatch', { onEnter: this.openTopHatchOnEnter, onUpdate: this.openTopHatchOnUpdate })
+      .addState('closeTopHatch', { onEnter: this.closeTopHatchOnEnter, onUpdate: this.closeTopHatchOnUpdate })
+      .setState('idle');
   }
 
-  private createAnimations(){
+  private createAnimations() {
     // open top
     // close top
     // open bottom
@@ -95,7 +95,7 @@ export default class PlayerController {
     this.sprite.anims.create({
       key: 'move',
       frameRate: 15,
-      frames: this.sprite.anims.generateFrameNumbers('minisub', {start: 9, end: 11}),
+      frames: this.sprite.anims.generateFrameNumbers('minisub', { start: 9, end: 11 }),
       repeat: -1
     });
 
@@ -103,37 +103,42 @@ export default class PlayerController {
     this.sprite.anims.create({
       key: 'idle',
       frameRate: 15,
-      frames: this.sprite.anims.generateFrameNumbers('minisub', {start: 0, end: 0}),
+      frames: this.sprite.anims.generateFrameNumbers('minisub', { start: 0, end: 0 }),
       repeat: -1
     });
+
+    // open/close top hatch
+    this.sprite.anims.create({
+      key: 'openTopHatch',
+      frameRate: 7,
+      frames: this.sprite.anims.generateFrameNumbers('minisub', { start: 0, end: 3 }),
+      repeat: 0
+    });
+
   }
 
   public update(delta: number) {
     this.stateMachine.update(delta);
   }
 
-  private idleOnEnter() { 
-    //display idle animation here        <--
-this.sprite.anims.play('idle', true);
-    this.sprite.anims.stop(); 
+  private idleOnEnter() {
+    this.sprite.anims.play('idle', true);
+    this.sprite.anims.stop();
   }
 
-  private idleOnUpdate(){
+  private idleOnUpdate() {
     const { left, right, up } = this.cursors;
-    if (left.isDown || right.isDown) this.stateMachine.setState('walking');
-
-    const spaceJustPressed = Phaser.Input.Keyboard.JustDown(this.cursors.space)
-    if (spaceJustPressed || up.isDown) this.stateMachine.setState('jumping');
+    if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
+    if (up.isDown) this.stateMachine.setState('openTopHatch');
+    
   }
 
   private movingForwardOnEnter() {
-    //this.sprite.anims.play('move', true);
+    this.sprite.anims.play('move', true);
   }
 
-  private walkingOnEnter() { this.sprite.anims.play('move', true); }
 
-  //change to movingOnUpdate()
-  private walkingOnUpdate() {
+  private movingForwardOnUpdate() {
     const { left, right, up, space } = this.cursors;
     const xSpeed = this.speed.x;
     const { matter } = this.scene;
@@ -149,34 +154,32 @@ this.sprite.anims.play('idle', true);
       this.stateMachine.setState('idle');
     }
 
-    const spaceJustPressed = Phaser.Input.Keyboard.JustDown(space)
-    if (spaceJustPressed || up.isDown) this.stateMachine.setState('jumping');
   }
 
-  //need to delete
-  private jumpingOnEnter() {
-    const { matter } = this.scene;
-    const ySpeed = this.speed.y;
-    matter.body.setVelocity(this.body, { x: this.body.velocity.x, y: -ySpeed });
-   }
+  private openTopHatchOnEnter() {
+    console.log('play opentophatch animation')
+    this.sprite.anims.play('openTopHatch', true);
+    // this.sprite.anims.stop();
+  }
 
-  //need to delete
-  private jumpingOnUpdate() {
-    const { left, right } = this.cursors;
-    const xSpeed = this.speed.x;
-    const { matter } = this.scene;
+  private openTopHatchOnUpdate() {
+    const { left, right, up, down } = this.cursors;
+    // console.log('');
+    // if (left.isDown || right.isDown) this.stateMachine.setState('closeTopHatch');
+    // if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
+    if (down.isDown) this.stateMachine.setState('closeTopHatch');
+  }
 
-    if (left.isDown) {
-      matter.body.setVelocity(this.body, { x: -xSpeed, y: this.body.velocity.y })
-      this.sprite.setFlipX(true);
-    } else if (right.isDown) {
-      matter.body.setVelocity(this.body, { x: xSpeed, y: this.body.velocity.y });
-      this.sprite.setFlipX(false);
-    } else {
-      matter.body.setVelocity(this.body, { x: 0, y: this.body.velocity.y });
-    }
+  private closeTopHatchOnEnter() {
+    console.log('play closetophatch animation')
+    this.sprite.anims.playReverse('openTopHatch', true);
+    // this.sprite.anims.stop();
+  }
 
-    // if (this.sprite.body.touching.down) this.stateMachine.setState('walking');
+  private closeTopHatchOnUpdate() {
+    const { left, right, up } = this.cursors;
+    if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
+    if (up.isDown) this.stateMachine.setState('openTopHatch');
   }
 
   // probably need to add some delete commands here or update when this is called
