@@ -37,6 +37,7 @@ export default class PlayerController {
   private scene: Phaser.Scene;
   private sprite: Phaser.GameObjects.Sprite | Phaser.Physics.Matter.Sprite;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+  private keys: Phaser.Input.Keyboard.Key;
   private obstacles: ObstaclesController;
   private options: Required<PlayerSceneOptions>;
   private body: MatterJS.BodyType;
@@ -78,8 +79,14 @@ export default class PlayerController {
       .addState('movingForward', { onEnter: this.movingForwardOnEnter, onUpdate: this.movingForwardOnUpdate })
       .addState('openTopHatch', { onEnter: this.openTopHatchOnEnter, onUpdate: this.openTopHatchOnUpdate })
       .addState('closeTopHatch', { onEnter: this.closeTopHatchOnEnter, onUpdate: this.closeTopHatchOnUpdate })
+      .addState('openBottomHatch', { onEnter: this.openBottomHatchOnEnter, onUpdate: this.openBottomHatchOnUpdate })
+      .addState('closeBottomHatch', { onEnter: this.closeBottomHatchOnEnter, onUpdate: this.closeBottomHatchOnUpdate })
       .setState('idle');
   }
+
+  // private keyJustDown(key) {
+  //   Phaser.Input.Keyboard.JustDown(key);
+  // }
 
   private createAnimations() {
     // open top
@@ -124,8 +131,13 @@ export default class PlayerController {
 
   private idleOnUpdate() {
     const { left, right, up } = this.cursors;
+    const spacebar = Phaser.Input.Keyboard.Key
+    
+    // const {  } = this.keys;
     if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
     if (up.isDown) this.stateMachine.setState('openTopHatch');
+    // if (spacebar.JustDown) this.stateMachine.setState('openBottomHatch');
+    
   }
 
   private movingForwardOnEnter() {
@@ -173,6 +185,42 @@ export default class PlayerController {
     if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
     if (up.isDown) this.stateMachine.setState('openTopHatch');
   }
+
+  private openBottomHatchOnEnter() {
+    this.sprite.anims.play('openTopHatch', true);
+  }
+
+  private openBottomHatchOnUpdate() {
+    const { down } = this.cursors;
+    if (down.isDown) this.stateMachine.setState('closeTopHatch');
+  }
+
+  private closeBottomHatchOnEnter() {
+    this.sprite.anims.playReverse('openTopHatch', true);
+  }
+
+  private closeBottomHatchOnUpdate() {
+    const { left, right, up } = this.cursors;
+    if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
+    // if (up.isDown) this.stateMachine.setState('openTopHatch');
+    if (up.isDown) this.stateMachine.setState('openTopHatch');
+  }
+
+  /*
+    // const keyW = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
+    // const keyA = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
+    // const keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    // const keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+    const keyS = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    const keyD = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
+
+    const keyT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);  //this will toggle top door, but should be changed to a better key 
+
+  */
+
+
+
 
   // probably need to add some delete commands here or update when this is called
   destroy() {
