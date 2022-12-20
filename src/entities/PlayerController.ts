@@ -37,7 +37,7 @@ export default class PlayerController {
   private scene: Phaser.Scene;
   private sprite: Phaser.GameObjects.Sprite | Phaser.Physics.Matter.Sprite;
   private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
-  private keys: Phaser.Input.Keyboard.Key;
+  // private keys: Phaser.Input.Keyboard.Key;
   private obstacles: ObstaclesController;
   private options: Required<PlayerSceneOptions>;
   private body: MatterJS.BodyType;
@@ -172,6 +172,10 @@ export default class PlayerController {
   private openTopHatchOnUpdate() {
     const { down } = this.cursors;
     if (down.isDown) this.stateMachine.setState('closeTopHatch');
+    let keyT = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);
+    if (Phaser.Input.Keyboard.JustDown(keyT)) {
+      console.log('T key has been pressed');
+    }
   }
 
   private closeTopHatchOnEnter() {
@@ -201,9 +205,18 @@ export default class PlayerController {
 
   private closeBottomHatchOnUpdate() {
     const { left, right, up } = this.cursors;
+    // let keyB = this.scene.input.keyboard.addKey('b');
     if (left.isDown || right.isDown) this.stateMachine.setState('movingForward');
     // if (up.isDown) this.stateMachine.setState('openTopHatch');
     if (up.isDown) this.stateMachine.setState('openTopHatch');
+    // if (keyB.on) this.stateMachine.setState('openTopHatch');
+    // let keyA = this.scene.input.keyboard.addKey('t');
+    // this.scene.input.keyboard.on('a', function (event) { });
+
+/*    let keyT = this.scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.T);
+    if (Phaser.Input.Keyboard.JustDown(keyT)) {
+      console.log('T key has been pressed');
+    }*/
   }
 
   /*
